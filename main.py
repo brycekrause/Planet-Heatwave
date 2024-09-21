@@ -10,6 +10,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 # Set up the display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Planet Heatwave")
+clock = pygame.time.Clock()
 
 # Colors
 WHITE = (255, 255, 255)
@@ -57,11 +58,9 @@ while running:
     screen.fill(WHITE)
     all_sprites.draw(screen)
 
-    # Flip the display
     pygame.display.flip()
 
-    # Cap the frame rate
-    pygame.time.Clock().tick(60)
+    clock.tick(60)
 
 pygame.quit()
 sys.exit()

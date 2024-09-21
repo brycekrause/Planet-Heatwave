@@ -20,8 +20,7 @@ BLACK = (0, 0, 0)
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill(BLACK)
+        self.image = pygame.image.load("gfx/img.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.speed = 5
@@ -36,7 +35,6 @@ class Player(pygame.sprite.Sprite):
             self.rect.y -= self.speed
         if keys[pygame.K_DOWN]:
             self.rect.y += self.speed
-
 
 
 # Create a player instance

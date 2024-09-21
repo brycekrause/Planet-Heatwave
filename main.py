@@ -85,11 +85,21 @@ def main_menu():
 # go here first
 main_menu()
 
+# Heat meter is broken
 planet1_status = False
 def planet1_env():
     print("Planet 1 environment")
     while planet1_status:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
         player.heat_meter()
+
+        all_sprites.update()
+        all_sprites.draw(SCREEN)
+
+        pygame.display.flip()
+        clock.tick(60)
     # what kind of loot is here?
     # background image?
 
@@ -97,7 +107,16 @@ planet2_status = False
 def planet2_env():
     print("Planet 2 environment")
     while planet2_status:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
         player.heat_meter()
+
+        all_sprites.update()
+        all_sprites.draw(SCREEN)
+
+        pygame.display.flip()
+        clock.tick(60)
     # what kind of loot is here?
     # background image?
 
@@ -105,7 +124,16 @@ planet3_status = False
 def planet3_env():
     print("Planet 3 environment")
     while planet3_status:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
         player.heat_meter()
+
+        all_sprites.update()
+        all_sprites.draw(SCREEN)
+
+        pygame.display.flip()
+        clock.tick(60)
     # what kind of loot is here?
     # background image?
 

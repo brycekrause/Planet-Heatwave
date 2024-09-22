@@ -19,15 +19,16 @@ BLACK = (0, 0, 0)
 
 # Player class
 class Player(pygame.sprite.Sprite):
+    global timer
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("gfx/img.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.speed = 5
-        self.heat = 0
-        self.heat_limit = 1500
         self.timer = 0
+        self.heat = 0
+        self.heat_limit = 50
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -42,7 +43,8 @@ class Player(pygame.sprite.Sprite):
         
     def heat_meter(self):
         self.timer += 1
-        if self.timer >= 2000:
+        print(self.timer)
+        if self.timer >= self.heat_limit:
             self.heat += 1
             self.timer = 0
         print(self.heat)
@@ -85,7 +87,7 @@ def main_menu():
 # go here first
 main_menu()
 
-# Heat meter is broken
+# The levels
 planet1_status = False
 def planet1_env():
     print("Planet 1 environment")
@@ -96,6 +98,7 @@ def planet1_env():
         player.heat_meter()
 
         all_sprites.update()
+        SCREEN.fill(WHITE)
         all_sprites.draw(SCREEN)
 
         pygame.display.flip()
@@ -113,6 +116,7 @@ def planet2_env():
         player.heat_meter()
 
         all_sprites.update()
+        SCREEN.fill(WHITE)
         all_sprites.draw(SCREEN)
 
         pygame.display.flip()
@@ -130,6 +134,7 @@ def planet3_env():
         player.heat_meter()
 
         all_sprites.update()
+        SCREEN.fill(WHITE)
         all_sprites.draw(SCREEN)
 
         pygame.display.flip()

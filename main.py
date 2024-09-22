@@ -153,12 +153,14 @@ spaceship_surf = pygame.transform.scale(spaceship_surf, (64,64))
 spaceship_rect = pygame.Rect(SCREEN_WIDTH-150, 100, 35,35)
 
 win_text = pygame.image.load("gfx/win.png").convert_alpha()
+warning_text = font.render("Get back to your ship!", True, BLACK)
 
 # The levels
 planet1_status = False
 def planet1_env():
     global planet1_status, main_menu_status, mineral_count, last_updated, animation_cooldown, index
-    print("Planet 1 environment")
+    player.rect.x = SCREEN_WIDTH-150
+    player.rect.y = 100
     while planet1_status:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -195,6 +197,10 @@ def planet1_env():
         mineral_count_text = font.render(f"Minerals: {mineral_count}/10", True, BLACK)
         SCREEN.blit(mineral_count_text, (50,50))
 
+        if mineral_count >= 10:
+            SCREEN.blit(warning_text, (SCREEN_WIDTH-200, 20))
+        
+            
         if player.rect.colliderect(spaceship_rect):
             if mineral_count >= 10:
                 player.heat = 0
@@ -204,8 +210,8 @@ def planet1_env():
 
         player.heat_meter()
         if player.heat >= 500:
-            player.rect.x = 50
-            player.rect.y = 50
+            player.rect.x = SCREEN_WIDTH-150
+            player.rect.y = 100
             player.heat = 500
             SCREEN.blit(overheated_text, (SCREEN_WIDTH/2-230,100))
             SCREEN.blit(restart_surf, restart_rect)

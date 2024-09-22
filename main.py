@@ -55,11 +55,9 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(SCREEN, (255,0,0), (SCREEN_WIDTH-50, 50, 30, self.heat))
 
         self.timer += 1
-        print(self.timer)
         if self.timer >= self.heat_limit:
             self.heat += 10
             self.timer = 0
-        print(self.heat)
 
 # Create a player instance
 player = Player()
@@ -94,7 +92,7 @@ guide_button_rect = pygame.Rect(SCREEN_WIDTH/2-150, 290, 300, 80)
 quit_button_surf = pygame.image.load("gfx\quit_btn.png").convert_alpha()
 quit_button_rect = pygame.Rect(SCREEN_WIDTH/2-150, 490, 300, 80)
 
-overheated_text = font.render("You overheated!", None, BLACK)
+overheated_text = pygame.image.load("gfx/overheated.png").convert_alpha()
 restart_surf = pygame.image.load("gfx/restart_btn.png").convert_alpha()
 restart_rect = pygame.Rect(SCREEN_WIDTH/2-150,260, 300,80)
 
@@ -135,6 +133,8 @@ mineral_surf = pygame.image.load("gfx/mineral.png")
 mineral_rect = pygame.Rect(random.randint(50,720),random.randint(50,550),18,18)
 mineral_count = 0
 
+planet1_bg = pygame.image.load("gfx/planet1_bg.png").convert_alpha()
+
 # The levels
 planet1_status = False
 def planet1_env():
@@ -163,18 +163,19 @@ def planet1_env():
             mineral_count += 1
 
         all_sprites.update()
-        SCREEN.fill(WHITE)
+        SCREEN.blit(planet1_bg, (0,0))
 
 
         SCREEN.blit(mineral_surf, mineral_rect)
+        mineral_count_text = font.render(f"Minerals: {mineral_count}/10", True, BLACK)
+        SCREEN.blit(mineral_count_text, (50,50))
 
         player.heat_meter()
         if player.heat >= 500:
             player.rect.x = 50
             player.rect.y = 50
-            print("You overheated!")
             player.heat = 500
-            SCREEN.blit(overheated_text, (100,100))
+            SCREEN.blit(overheated_text, (SCREEN_WIDTH/2-200,100))
             SCREEN.blit(restart_surf, restart_rect)
             SCREEN.blit(quit_button_surf, quit_button_rect)
             
@@ -182,8 +183,6 @@ def planet1_env():
 
         pygame.display.flip()
         clock.tick(60)
-    # what kind of loot is here?
-    # background image?
 
 # i dont think planet 2 or 3 will get done
 planet2_status = False

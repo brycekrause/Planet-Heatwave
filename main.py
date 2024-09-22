@@ -14,6 +14,8 @@ SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Planet Heatwave")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("None", 25)
+last_updated = pygame.time.get_ticks()
+animation_cooldown = 70
 
 # Colors
 WHITE = (255, 255, 255)
@@ -26,15 +28,21 @@ pygame.mixer.music.play(-1)
 
 all_sprites = pygame.sprite.Group()
 
+player_sprites = Spritesheet('gfx/Sprite-0007.png')
+
+still_frame = player_sprites.get_sprite(0,0,32,48)
+walking_frames = [player_sprites.parse_sprite('Sprite-0007 0.'),player_sprites.parse_sprite('Sprite-0007 1.'),player_sprites.parse_sprite('Sprite-0007 2.'),player_sprites.parse_sprite('Sprite-0007 3.'),player_sprites.parse_sprite('Sprite-0007 4.'),player_sprites.parse_sprite('Sprite-0007 5.'),player_sprites.parse_sprite('Sprite-0007 6.'),player_sprites.parse_sprite('Sprite-0007 7.'),player_sprites.parse_sprite('Sprite-0007 8.'),player_sprites.parse_sprite('Sprite-0007 9.')]
+index = 0
+
 # Player class
 class Player(pygame.sprite.Sprite):
     global timer
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("gfx/img.png").convert_alpha()
+        self.image = still_frame
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        self.speed = 5
+        self.speed = 4
         self.timer = 0
         self.heat = 0
         self.heat_limit = 20
@@ -43,12 +51,16 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w] or keys[pygame.K_UP]:
             self.rect.y -= self.speed
+            player.image = walking_frames[index]
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
+            player.image = walking_frames[index]
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.rect.y += self.speed    
+            player.image = walking_frames[index]
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
+            player.image = pygame.transform.flip(walking_frames[index], True, False)
         
     def heat_meter(self):
         pygame.draw.rect(SCREEN, BLACK, (SCREEN_WIDTH-50, 50, 30, SCREEN_HEIGHT-100), 1)
@@ -129,16 +141,23 @@ def main_menu():
 # go here first
 main_menu()
 
-mineral_surf = pygame.image.load("gfx/mineral.png")
+mineral_surf = pygame.image.load("gfx/mineral_F.png")
+mineral_surf = pygame.transform.scale(mineral_surf, (40,37))
 mineral_rect = pygame.Rect(random.randint(50,720),random.randint(50,550),18,18)
 mineral_count = 0
 
 planet1_bg = pygame.image.load("gfx/planet1_bg.png").convert_alpha()
 
+spaceship_surf = pygame.image.load("gfx/ship.png").convert_alpha()
+spaceship_surf = pygame.transform.scale(spaceship_surf, (64,64))
+spaceship_rect = pygame.Rect(SCREEN_WIDTH-150, 100, 35,35)
+
+win_text = pygame.image.load("gfx/win.png").convert_alpha()
+
 # The levels
 planet1_status = False
 def planet1_env():
-    global planet1_status, main_menu_status, mineral_count
+    global planet1_status, main_menu_status, mineral_count, last_updated, animation_cooldown, index
     print("Planet 1 environment")
     while planet1_status:
         for event in pygame.event.get():
@@ -146,16 +165,22 @@ def planet1_env():
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = event.pos
-                if restart_rect.collidepoint(mouse_pos):
-                    player.heat = 0
-                    planet1_env()
-                elif quit_button_rect.collidepoint(mouse_pos):
-                    planet1_status = False
-                    main_menu_status = True
-                    player.heat = 0
-                    main_menu()
+                if player.heat == 500 or player.heat == 0:
+                    if restart_rect.collidepoint(mouse_pos):
+                        player.heat = 0
+                        mineral_count = 0
+                        planet1_env()
+                    elif quit_button_rect.collidepoint(mouse_pos):
+                        planet1_status = False
+                        main_menu_status = True
+                        player.heat = 0
+                        mineral_count = 0
+                        main_menu()
         
-        
+        current_time = pygame.time.get_ticks()
+        if current_time - last_updated > animation_cooldown:  
+            index = (index + 1) % len(walking_frames)
+            last_updated = current_time
 
         if player.rect.colliderect(mineral_rect):
             mineral_rect.x = random.randint(50,750)
@@ -164,18 +189,25 @@ def planet1_env():
 
         all_sprites.update()
         SCREEN.blit(planet1_bg, (0,0))
-
+        SCREEN.blit(spaceship_surf, spaceship_rect)
 
         SCREEN.blit(mineral_surf, mineral_rect)
         mineral_count_text = font.render(f"Minerals: {mineral_count}/10", True, BLACK)
         SCREEN.blit(mineral_count_text, (50,50))
+
+        if player.rect.colliderect(spaceship_rect):
+            if mineral_count >= 10:
+                player.heat = 0
+                SCREEN.blit(win_text, (SCREEN_WIDTH/2-150, 100))
+                SCREEN.blit(restart_surf, restart_rect)
+                SCREEN.blit(quit_button_surf, quit_button_rect)
 
         player.heat_meter()
         if player.heat >= 500:
             player.rect.x = 50
             player.rect.y = 50
             player.heat = 500
-            SCREEN.blit(overheated_text, (SCREEN_WIDTH/2-200,100))
+            SCREEN.blit(overheated_text, (SCREEN_WIDTH/2-230,100))
             SCREEN.blit(restart_surf, restart_rect)
             SCREEN.blit(quit_button_surf, quit_button_rect)
             

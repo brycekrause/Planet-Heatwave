@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
         self.timer = 0
         self.heat = 0
-        self.heat_limit = 50
+        self.heat_limit = 20
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -42,10 +42,13 @@ class Player(pygame.sprite.Sprite):
             self.rect.x += self.speed
         
     def heat_meter(self):
+        pygame.draw.rect(SCREEN, BLACK, (SCREEN_WIDTH-50, 50, 30, SCREEN_HEIGHT-100), 1)
+        pygame.draw.rect(SCREEN, (255,0,0), (SCREEN_WIDTH-50, 50, 30, self.heat))
+
         self.timer += 1
         print(self.timer)
         if self.timer >= self.heat_limit:
-            self.heat += 1
+            self.heat += 10
             self.timer = 0
         print(self.heat)
 
@@ -54,16 +57,40 @@ player = Player()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 
+guide_status = False
+def guide():
+    global guide_status
+    guide_surf = pygame.image.load('gfx/guide.png'). convert_alpha()
+    guide_x = pygame.image.load('gfx/x_btn.png').convert_alpha()
+    guide_x_rect = pygame.Rect(585,65,50,50)
+
+    while guide_status:
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = event.pos
+                    if guide_x_rect.collidepoint(mouse_pos):
+                        guide_status = False
+                        main_menu()
+        SCREEN.blit(guide_surf, (150,50))
+        SCREEN.blit(guide_x, guide_x_rect)
+        pygame.display.flip()
+
 # Main menu
 main_menu_status = True
 def main_menu():
-    global main_menu_status
+    global main_menu_status, guide_status
     print("mainmenu")
     title_text = font.render("Planet Heatwave", None, BLACK)
     play_button_surf = pygame.image.load("gfx\play_btn.png").convert_alpha()
-    play_button_rect = pygame.Rect(SCREEN_WIDTH/2, 100, 300, 80)
+    play_button_rect = pygame.Rect(SCREEN_WIDTH/2-150, 60, 300, 80)
+    guide_button_surf = pygame.image.load("gfx\guide_btn.png").convert_alpha()
+    guide_button_rect = pygame.Rect(SCREEN_WIDTH/2-150, 260, 300, 80)    
     quit_button_surf = pygame.image.load("gfx\quit_btn.png").convert_alpha()
-    quit_button_rect = pygame.Rect(SCREEN_WIDTH/2, 300, 300, 80)
+    quit_button_rect = pygame.Rect(SCREEN_WIDTH/2-150, 460, 300, 80)
+    
+
 
     while main_menu_status:
         for event in pygame.event.get():
@@ -77,9 +104,16 @@ def main_menu():
                 elif quit_button_rect.collidepoint(mouse_pos):
                     print('quit')
                     pygame.quit()
+                elif guide_button_rect.collidepoint(mouse_pos):
+                    print('guide')
+                    guide_status = True
+                    guide()
+
+        SCREEN.fill(BLACK)
         SCREEN.blit(title_text, (SCREEN_WIDTH/2, 50))
         SCREEN.blit(play_button_surf, play_button_rect)
         SCREEN.blit(quit_button_surf, quit_button_rect)
+        SCREEN.blit(guide_button_surf, guide_button_rect)
 
         pygame.display.flip()
         clock.tick(60)
@@ -90,15 +124,23 @@ main_menu()
 # The levels
 planet1_status = False
 def planet1_env():
+    global planet1_status
     print("Planet 1 environment")
     while planet1_status:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        player.heat_meter()
+        
 
         all_sprites.update()
         SCREEN.fill(WHITE)
+
+        player.heat_meter()
+        if player.heat >= 500:
+            player.heat = 0
+            print("You overheated!")
+            planet1_status = False
+            
         all_sprites.draw(SCREEN)
 
         pygame.display.flip()
@@ -113,10 +155,14 @@ def planet2_env():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        player.heat_meter()
+        
 
         all_sprites.update()
         SCREEN.fill(WHITE)
+        player.heat_meter()
+        if player.heat >= 500:
+            print("You overheated!")
+            planet2_status = False
         all_sprites.draw(SCREEN)
 
         pygame.display.flip()
@@ -131,10 +177,14 @@ def planet3_env():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        player.heat_meter()
+        
 
         all_sprites.update()
         SCREEN.fill(WHITE)
+        player.heat_meter()
+        if player.heat >= 500:
+            print("You overheated!")
+            planet1_status = False
         all_sprites.draw(SCREEN)
 
         pygame.display.flip()
@@ -143,6 +193,8 @@ def planet3_env():
     # background image?
 
 # menu planet objects
+locked_surf = pygame.image.load("gfx/planet_select/lock.png").convert_alpha()
+
 planet1_select_text = font.render("Planet Glarbin Shmargin", None, BLACK)
 planet1_select_surf = pygame.image.load("gfx/planet_select/planet1.png").convert_alpha()
 planet1_select_rect = pygame.Rect(100,130, 100,100)
@@ -158,7 +210,7 @@ planet3_select_surf = pygame.image.load("gfx/planet_select/planet3.png").convert
 planet3_select_rect = pygame.Rect(400,430, 100,100)
 planet3_locked = True
 
-# Main game loop
+# Select planet
 running = True
 while running:
     for event in pygame.event.get():
@@ -188,19 +240,19 @@ while running:
                 else:
                     print("Planet is locked")
 
-    # Update all sprites
-    all_sprites.update()
-
     # Draw everything
     SCREEN.fill(WHITE)
-    all_sprites.draw(SCREEN)
 
     SCREEN.blit(planet1_select_text, (100, 100))
     SCREEN.blit(planet1_select_surf, planet1_select_rect)
+
     SCREEN.blit(planet2_select_text, (250, 250))
     SCREEN.blit(planet2_select_surf, planet2_select_rect)
+    SCREEN.blit(locked_surf, (250,250))
+
     SCREEN.blit(planet3_select_text, (400, 400))
     SCREEN.blit(planet3_select_surf, planet3_select_rect)
+    SCREEN.blit(locked_surf, (400,400))
 
 
     pygame.display.flip()

@@ -18,6 +18,11 @@ font = pygame.font.SysFont("None", 25)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+# Music
+music=pygame.mixer.music.load("sfx/PHTrack1.mp3")
+music2=pygame.mixer.music.load("sfx/PHTrack2.mp3")
+pygame.mixer.music.play(-1)
+
 all_sprites = pygame.sprite.Group()
 
 # Player class

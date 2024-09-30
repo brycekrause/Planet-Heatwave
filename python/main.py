@@ -30,7 +30,7 @@ all_sprites = pygame.sprite.Group()
 
 player_sprites = Spritesheet('gfx/Sprite-0007.png')
 
-still_frame = player_sprites.get_sprite(0,0,32,48)
+still_frame = player_sprites.parse_sprite('Sprite-0007 0.')
 walking_frames = [player_sprites.parse_sprite('Sprite-0007 0.'),player_sprites.parse_sprite('Sprite-0007 1.'),player_sprites.parse_sprite('Sprite-0007 2.'),player_sprites.parse_sprite('Sprite-0007 3.'),player_sprites.parse_sprite('Sprite-0007 4.'),player_sprites.parse_sprite('Sprite-0007 5.'),player_sprites.parse_sprite('Sprite-0007 6.'),player_sprites.parse_sprite('Sprite-0007 7.'),player_sprites.parse_sprite('Sprite-0007 8.'),player_sprites.parse_sprite('Sprite-0007 9.')]
 index = 0
 
